@@ -10,17 +10,20 @@ from functools import reduce
 import operator
 from scipy.interpolate import make_interp_spline, BSpline
 
-Rt=713
-tau_b=444
+sigma_f=750
+sigma_f02=500
+tau_b=1000
 #(sigma1-sigma2)/2
 
 sigma1 = 1.001
 sigma2 = 1
 sigma3 = 0
 
-
-a = 1.9
-m = 1
+if(sigma_f/sigma_f02<=1.32):
+    m = (log(sigma_f/sigma_f02,e)+0.056)/3.44
+else:
+    m = (log(sigma_f/sigma_f02,e)+0.216)/4.78
+a = (tau_b*sqrt(3)/sigma_f)**(1/m)
 SIGMAs=[]
 SIGMAsX=[]
 SIGMAsY=[]
@@ -41,7 +44,7 @@ while (sigma1 >= -1):
               round(sigma2/sigma_eq, 2))
         SIGMAsX.append(sigma1/sigma_eq)
         SIGMAsY.append(sigma2/sigma_eq)
-        sigs=[sigma1/sigma_eq, sigma2/sigma_eq/2]
+        sigs=[sigma1/sigma_eq, sigma2/sigma_eq]
         SIGMAs.append(sigs)
         sigma2 = sigma2 - 0.1
     sigma1 = sigma1 - 0.1
@@ -64,16 +67,16 @@ nSigY.append(points[0][1])
 
 fig, ax = plt.subplots(figsize=(7, 6))
 plt.grid(color='lightgray', linestyle='--')
-ax.set_title("Критерий Колмогорова")
-ax.set_xlabel("σ_x/σ_Fx")
-ax.set_ylabel("σ_y/σ_Fy")
+ax.set_title(f"Критерий Колмогорова τ={tau_b}")
+ax.set_xlabel("σ_x") #/σ_Fx
+ax.set_ylabel("σ_y") #/σ_Fy
 plt.plot(nSigX,nSigY, color="black")
 ax.set_aspect('equal', adjustable='box')
 
-ax.set_xlim(-8, 2)
-ax.set_ylim(-8, 2)
-ax.xaxis.set_major_locator(MultipleLocator(1))
-ax.yaxis.set_major_locator(MultipleLocator(1))
+# ax.set_xlim(-2, 2)
+# ax.set_ylim(-2, 2)
+ax.xaxis.set_major_locator(MultipleLocator(0.5))
+ax.yaxis.set_major_locator(MultipleLocator(0.5))
 plt.show()
 # print(a*sigma0/sigma_i)
 # print(-3*log(a*sigma0/sigma_i, e))
